@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+<script type="text/javascript">
+function returnXml() {
+	if(window.XMLHttpRequest){	//非IE
+		var xmlhttprequest = new XMLHttpRequest();
+	}else if(window.ActiveXObject){	//IE
+		try{
+			var xmlhttprequest = new ActiveXObject("Msxml2.XMLHTTP");
+		}catch(e) {
+			try{
+				xmlhttprequest = new ActiveXObject("Microsoft.XMLhTTP");
+			}catch(e){}
+		}
+	}
+	return xmlhttprequest;
+}
+
+//
+var result = '';
+
+function get() {
+	var xmlhttp = returnXml();
+	xmlhttp.open("POST","spider.php",false);
+	xmlhttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	xmlhttp.send(null);
+	var str = xmlhttp.responseText;
+
+	/*str = str.slice(str.indexOf('<div id=\"mw-content-text\"'),str.length);
+	while(str.indexOf('<pre>') != -1){
+		result += str.slice(str.indexOf('<pre>'),str.indexOf('</pre>')+5);
+		str = str.slice(str.indexOf('</pre>')+5,str.length);
+	} */
+	console.log(str);
+	str = str.slice(str.indexOf('<table class=\"wikitable sortable'),str.length);
+	//str = str.slice(str.indexOf('<table class=\"wikitable'),str.length);
+	//str = str.slice(str.indexOf('<table border=\"1\" style=\"border:1px solid #9c9;border-collapse:collapse;border: 1px solid #99cc99;\" cellpadding=\"3\" cellspacing=\"0\" align=\"center\">'),str.length);
+	console.log(str);
+	str = str.slice(0,str.indexOf('</table>')+8);
+	console.log(str);
+	result = str;
+	return result;
+}
+get();
+	//console.log(result);
+function save() {
+	//console.log(result);
+	var msg = '';
+	msg += 'result=';
+	msg += result;
+	msg += '&fileName=fruit';
+	var xml2 = returnXml();
+	xml2.open("POST","save.php",false);
+	xml2.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	console.log(msg);
+	xml2.send(msg);
+	document.getElementById("value").innerText = result;
+	//alert(xml2.responseText);
+}
+
+</script>
+  
+<div>
+	<input type="button" value="保存" onclick="save();">
+</div>
+<div id="value" style="width:600px;height=400px;margin:0 auto;overflow:auto;"></div>
+</body>
+</html>
